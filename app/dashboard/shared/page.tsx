@@ -40,7 +40,7 @@ export default async function SharedPage() {
           </div>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-            {sharedContexts.map((sc) => (
+            {sharedContexts.map((sc: any) => (
               <div
                 key={sc.id}
                 style={{

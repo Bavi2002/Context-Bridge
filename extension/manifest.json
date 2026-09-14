@@ -9,7 +9,7 @@
     "https://claude.ai/*",
     "https://gemini.google.com/*",
     "https://grok.com/*",
-    "http://localhost:3000/*"
+    "https://context-bridge-git-main-bavithran-s-projects.vercel.app/*"
   ],
   "action": {
     "default_popup": "popup/popup.html",

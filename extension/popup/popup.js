@@ -1,4 +1,4 @@
-const APP_URL = "http://localhost:3000"; // Change to production URL when deployed
+const APP_URL = "https://context-bridge-git-main-bavithran-s-projects.vercel.app"; // Change to production URL when deployed
 
 const SUPPORTED_SITES = {
   "chatgpt.com": "ChatGPT",
