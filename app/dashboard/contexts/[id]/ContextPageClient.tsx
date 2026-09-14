@@ -9,6 +9,7 @@ import styles from "./context.module.css";
 interface ContextPageClientProps {
   context: {
     id: string;
+    projectId?: string | null;
     title: string;
     structured: StructuredContext;
     tokensOriginal: number;
@@ -18,15 +19,17 @@ interface ContextPageClientProps {
     versions: { version: number; changeSummary?: string | null; createdAt: string }[];
     sharedLinks: { id: string; token: string; viewCount: number }[];
   };
+  projects: { id: string; name: string }[];
 }
 
 const AI_ICONS: Record<string, string> = {
   chatgpt: "🟢", claude: "🟠", gemini: "🔵", grok: "⚫", other: "🔘", unknown: "🔘",
 };
 
-export default function ContextPageClient({ context }: ContextPageClientProps) {
+export default function ContextPageClient({ context, projects }: ContextPageClientProps) {
   const [ctx, setCtx] = useState(context.structured);
   const [title, setTitle] = useState(context.title);
+  const [projectId, setProjectId] = useState(context.projectId || "");
   const [showContinue, setShowContinue] = useState(false);
   const [showShare, setShowShare] = useState(false);
   const [shareToken, setShareToken] = useState(
@@ -55,6 +58,16 @@ export default function ContextPageClient({ context }: ContextPageClientProps) {
       setTimeout(() => setSaved(false), 2000);
       router.refresh();
     });
+  }
+
+  async function handleAssignProject(newProjectId: string) {
+    setProjectId(newProjectId);
+    await fetch(`/api/contexts/${context.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ projectId: newProjectId === "" ? null : newProjectId }),
+    });
+    router.refresh();
   }
 
   async function handleShare() {
@@ -97,6 +110,17 @@ export default function ContextPageClient({ context }: ContextPageClientProps) {
               </span>
             )}
             <span className="badge badge-neutral">v{context.currentVersion}</span>
+            <select 
+              className="input select"
+              value={projectId}
+              onChange={(e) => handleAssignProject(e.target.value)}
+              style={{ width: "auto", padding: "4px 32px 4px 12px", height: "28px", fontSize: "13px", cursor: "pointer", background: "var(--bg-secondary)" }}
+            >
+              <option value="">No Project</option>
+              {projects.map(p => (
+                <option key={p.id} value={p.id}>{p.name}</option>
+              ))}
+            </select>
             {compressionPercent > 0 && (
               <span className="badge badge-success">{compressionPercent}% compressed</span>
             )}
@@ -180,6 +204,16 @@ export default function ContextPageClient({ context }: ContextPageClientProps) {
                 items={ctx.decisions || []}
                 onChange={(items) => updateCtx({ decisions: items })}
                 placeholder="Add decision..."
+              />
+            </section>
+
+            {/* Code Snippets & Commands */}
+            <section className={styles.section}>
+              <h2 className={styles.sectionTitle}>💻 Code Snippets & Commands</h2>
+              <EditableList
+                items={ctx.code_snippets || []}
+                onChange={(items) => updateCtx({ code_snippets: items })}
+                placeholder="Add code snippet or command..."
               />
             </section>
 

@@ -2,6 +2,7 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import styles from "../dashboard.module.css";
+import CreateProjectButton from "./components/CreateProjectButton";
 
 function timeAgo(date: Date): string {
   const diff = Date.now() - new Date(date).getTime();
@@ -33,7 +34,7 @@ export default async function ProjectsPage() {
             Organize contexts by project. Build persistent AI memory.
           </p>
         </div>
-        <button id="new-project-btn" className="btn btn-primary">+ New Project</button>
+        <CreateProjectButton />
       </div>
 
       <div className={styles.pageContent}>
@@ -45,7 +46,7 @@ export default async function ProjectsPage() {
               <p className={styles.emptyStateText}>
                 Projects help you organize multiple conversations around a common goal.
               </p>
-              <button id="create-first-project" className="btn btn-primary">+ Create your first project</button>
+              <CreateProjectButton isFirst={true} />
             </div>
           ) : (
             projects.map((project: any) => (

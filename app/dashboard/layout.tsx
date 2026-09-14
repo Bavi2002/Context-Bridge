@@ -1,6 +1,7 @@
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import Sidebar from "./components/Sidebar";
+import ReportBugWidget from "./components/ReportBugWidget";
 import styles from "./dashboard.module.css";
 
 export default async function DashboardLayout({
@@ -17,6 +18,7 @@ export default async function DashboardLayout({
     <div className={styles.shell}>
       <Sidebar user={session.user} />
       <main className={styles.main}>{children}</main>
+      <ReportBugWidget />
     </div>
   );
 }

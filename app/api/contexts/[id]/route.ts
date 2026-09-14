@@ -49,24 +49,28 @@ export async function PATCH(
   }
 
   const body = await req.json();
-  const { title, structured } = body;
+  const { title, structured, projectId } = body;
 
-  // Create new version snapshot before updating
-  const newVersion = context.currentVersion + 1;
-  await prisma.contextVersion.create({
-    data: {
-      contextId: context.id,
-      version: newVersion,
-      structured: structured as object,
-      changeSummary: body.changeSummary || `Manual edit — version ${newVersion}`,
-    },
-  });
+  // Create new version snapshot before updating (only if structured data changes)
+  let newVersion = context.currentVersion;
+  if (structured) {
+    newVersion += 1;
+    await prisma.contextVersion.create({
+      data: {
+        contextId: context.id,
+        version: newVersion,
+        structured: structured as object,
+        changeSummary: body.changeSummary || `Manual edit — version ${newVersion}`,
+      },
+    });
+  }
 
   const updated = await prisma.context.update({
     where: { id: id },
     data: {
       ...(title && { title }),
       ...(structured && { structured: structured as object }),
+      ...(projectId !== undefined && { projectId }),
       currentVersion: newVersion,
     },
   });

@@ -29,6 +29,7 @@ export interface StructuredContext {
   completed_tasks: string[];
   pending_tasks: string[];
   files: string[];
+  code_snippets: string[];
   last_user_request: string;
   last_assistant_response: string;
 }

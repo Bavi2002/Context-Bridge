@@ -425,6 +425,10 @@ export default function LandingPage() {
             <span className={styles.logoMark}>⬡</span>
             ContextBridge
           </div>
+          <div style={{ display: "flex", gap: "16px", marginBottom: "16px", marginTop: "16px" }}>
+            <Link href="/terms" style={{ color: "var(--text-secondary)", fontSize: "14px", textDecoration: "none" }}>Terms & Conditions</Link>
+            <Link href="/privacy" style={{ color: "var(--text-secondary)", fontSize: "14px", textDecoration: "none" }}>Privacy Policy</Link>
+          </div>
           <p className={styles.footerTagline}>Start anywhere. Continue anywhere.</p>
           <p className={styles.footerCopy}>© 2026 ContextBridge. Built with care for AI power users.</p>
         </div>
