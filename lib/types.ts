@@ -15,6 +15,13 @@ export interface CurrentState {
   progressSummary: string;
 }
 
+export interface CodeSnippet {
+  code: string;
+  language?: string;
+  filename?: string;
+  description?: string;
+}
+
 export interface StructuredContext {
   title: string;
   summary: string;
@@ -29,7 +36,7 @@ export interface StructuredContext {
   completed_tasks: string[];
   pending_tasks: string[];
   files: string[];
-  code_snippets: string[];
+  code_snippets: (string | CodeSnippet)[];
   last_user_request: string;
   last_assistant_response: string;
 }

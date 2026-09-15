@@ -40,7 +40,14 @@ Return a JSON object with EXACTLY this structure (no markdown, no code blocks, r
   "completed_tasks": ["Tasks or features that have been completed"],
   "pending_tasks": ["Tasks still to be done"],
   "files": ["File names, paths, or documents mentioned"],
-  "code_snippets": ["Important code snippets, shell commands, or bug fixes to preserve. Exclude images, video, and audio."],
+  "code_snippets": [
+    {
+      "code": "The full code snippet or command",
+      "language": "Language (e.g. typescript, bash, python)",
+      "filename": "Filename if mentioned (e.g. app/page.tsx)",
+      "description": "Brief description of what this code does"
+    }
+  ],
   "last_user_request": "The final request or question from the user",
   "last_assistant_response": "Brief summary of the last assistant response"
 }

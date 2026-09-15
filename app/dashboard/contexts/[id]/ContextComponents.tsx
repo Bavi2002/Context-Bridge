@@ -8,7 +8,7 @@ interface ContinueModalProps {
   onClose: () => void;
 }
 
-import { MessageSquare, Cpu, Sparkles, Binary, Globe } from "lucide-react";
+import { MessageSquare, Cpu, Sparkles, Binary, Globe, Copy, Check } from "lucide-react";
 
 const PROVIDERS = [
   { id: "chatgpt", name: "ChatGPT", icon: <MessageSquare size={18} />, url: "https://chatgpt.com", desc: "GPT-4o, GPT-4" },
@@ -214,6 +214,129 @@ export function EditableList({ items, onChange, placeholder = "Add item..." }: E
           onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); handleAdd(); } }}
         />
         <button className="btn btn-secondary btn-sm" onClick={handleAdd}>+ Add</button>
+      </div>
+    </div>
+  );
+}
+
+export interface CodeSnippet {
+  code: string;
+  language?: string;
+  filename?: string;
+  description?: string;
+}
+
+interface CodeSnippetListProps {
+  items: (string | CodeSnippet)[];
+  onChange: (items: (string | CodeSnippet)[]) => void;
+  placeholder?: string;
+}
+
+export function CodeSnippetList({ items, onChange, placeholder = "Add snippet..." }: CodeSnippetListProps) {
+  const [newItem, setNewItem] = useState<CodeSnippet>({ code: "", language: "", filename: "" });
+  const [editingIndex, setEditingIndex] = useState<number | null>(null);
+  const [editValue, setEditValue] = useState<CodeSnippet>({ code: "" });
+  const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
+
+  function handleAdd() {
+    if (!newItem.code.trim()) return;
+    onChange([...items, { ...newItem, code: newItem.code.trim() }]);
+    setNewItem({ code: "", language: "", filename: "" });
+  }
+
+  function handleDelete(index: number) {
+    onChange(items.filter((_, i) => i !== index));
+  }
+
+  function startEdit(index: number) {
+    setEditingIndex(index);
+    const item = items[index];
+    setEditValue(typeof item === "string" ? { code: item } : { ...item });
+  }
+
+  function saveEdit() {
+    if (editingIndex === null) return;
+    const updated = [...items];
+    updated[editingIndex] = { ...editValue, code: editValue.code.trim() || (typeof items[editingIndex] === "string" ? items[editingIndex] as string : (items[editingIndex] as CodeSnippet).code) };
+    onChange(updated);
+    setEditingIndex(null);
+  }
+
+  async function handleCopy(text: string, index: number) {
+    await navigator.clipboard.writeText(text);
+    setCopiedIndex(index);
+    setTimeout(() => setCopiedIndex(null), 2000);
+  }
+
+  return (
+    <div className={styles.editableList} style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+      {items.map((rawItem, i) => {
+        const item: CodeSnippet = typeof rawItem === "string" ? { code: rawItem } : rawItem;
+        return (
+          <div key={i} className={styles.editableItem} style={{ flexDirection: "column", alignItems: "stretch", background: "#1e1e1e", padding: "12px", borderRadius: "8px", border: "1px solid var(--border)" }}>
+            {editingIndex === i ? (
+              <div className={styles.editableItemEdit} style={{ flexDirection: "column", alignItems: "stretch", width: "100%", gap: "8px" }}>
+                <div style={{ display: "flex", gap: "8px" }}>
+                  <input className="input" placeholder="Filename (e.g. app.js)" value={editValue.filename || ""} onChange={(e) => setEditValue({...editValue, filename: e.target.value})} style={{ flex: 1, background: "#252526", color: "#d4d4d4", border: "1px solid #3c3c3c" }} />
+                  <input className="input" placeholder="Language (e.g. javascript)" value={editValue.language || ""} onChange={(e) => setEditValue({...editValue, language: e.target.value})} style={{ width: "150px", background: "#252526", color: "#d4d4d4", border: "1px solid #3c3c3c" }} />
+                </div>
+                <textarea
+                  className="input textarea"
+                  value={editValue.code}
+                  onChange={(e) => setEditValue({...editValue, code: e.target.value})}
+                  autoFocus
+                  style={{ minHeight: "120px", fontFamily: "monospace", fontSize: "13px", width: "100%", background: "#252526", color: "#d4d4d4", border: "1px solid #3c3c3c" }}
+                />
+                <div style={{ display: "flex", gap: "8px", marginTop: "4px", justifyContent: "flex-end" }}>
+                  <button className="btn btn-primary btn-sm" onClick={saveEdit}>Save</button>
+                  <button className="btn btn-ghost btn-sm" onClick={() => setEditingIndex(null)}>Cancel</button>
+                </div>
+              </div>
+            ) : (
+              <div style={{ display: "flex", flexDirection: "column", width: "100%" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", paddingBottom: "8px", borderBottom: "1px solid #333", marginBottom: "12px" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                    {item.filename && <span style={{ fontSize: "13px", fontWeight: 600, color: "#d4d4d4" }}>{item.filename}</span>}
+                    {item.language && <span style={{ fontSize: "11px", textTransform: "uppercase", color: "#888", border: "1px solid #333", padding: "2px 6px", borderRadius: "4px" }}>{item.language}</span>}
+                    {!item.filename && !item.language && <span style={{ fontSize: "12px", color: "#888" }}>Code Snippet</span>}
+                  </div>
+                  <div style={{ display: "flex", gap: "4px" }}>
+                    <button 
+                      className="btn btn-ghost btn-sm btn-icon" 
+                      onClick={() => handleCopy(item.code, i)} 
+                      title="Copy"
+                      style={{ display: "flex", alignItems: "center", gap: "4px", fontSize: "12px", color: "#a0a0a0" }}
+                    >
+                      {copiedIndex === i ? <><Check size={14} color="var(--success)" /> Copied</> : <><Copy size={14} /> Copy</>}
+                    </button>
+                    <button className="btn btn-ghost btn-sm btn-icon" style={{ color: "#a0a0a0" }} onClick={() => startEdit(i)} title="Edit">✎</button>
+                    <button className="btn btn-ghost btn-sm btn-icon" onClick={() => handleDelete(i)} title="Delete" style={{ color: "var(--error)" }}>✕</button>
+                  </div>
+                </div>
+                {item.description && <p style={{ fontSize: "12px", color: "#a0a0a0", marginBottom: "8px" }}>{item.description}</p>}
+                <pre style={{ margin: 0, padding: 0, overflowX: "auto", fontFamily: "monospace", fontSize: "13px", color: "#d4d4d4", whiteSpace: "pre-wrap", wordBreak: "break-all" }}>
+                  <code>{item.code}</code>
+                </pre>
+              </div>
+            )}
+          </div>
+        );
+      })}
+      <div className={styles.editableAdd} style={{ flexDirection: "column", alignItems: "stretch", marginTop: "12px", gap: "8px" }}>
+        <div style={{ display: "flex", gap: "8px" }}>
+          <input className="input" placeholder="Filename (optional)" value={newItem.filename || ""} onChange={(e) => setNewItem({...newItem, filename: e.target.value})} style={{ flex: 1, background: "#1e1e1e", color: "#d4d4d4", border: "1px solid #3c3c3c" }} />
+          <input className="input" placeholder="Language (optional)" value={newItem.language || ""} onChange={(e) => setNewItem({...newItem, language: e.target.value})} style={{ width: "150px", background: "#1e1e1e", color: "#d4d4d4", border: "1px solid #3c3c3c" }} />
+        </div>
+        <textarea
+          className="input textarea"
+          placeholder={placeholder}
+          value={newItem.code}
+          onChange={(e) => setNewItem({...newItem, code: e.target.value})}
+          style={{ minHeight: "100px", fontFamily: "monospace", fontSize: "13px", width: "100%", background: "#1e1e1e", color: "#d4d4d4", border: "1px solid #3c3c3c" }}
+        />
+        <div style={{ display: "flex", justifyContent: "flex-end" }}>
+          <button className="btn btn-secondary btn-sm" onClick={handleAdd}>+ Add Snippet</button>
+        </div>
       </div>
     </div>
   );

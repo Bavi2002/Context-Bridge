@@ -136,6 +136,32 @@ export default function SharedContextClient({ context }: Props) {
               </div>
             )}
 
+            {ctx.code_snippets?.length > 0 && (
+              <div className={styles.section}>
+                <h2 className={styles.sectionTitle}>💻 Code Snippets</h2>
+                <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+                  {ctx.code_snippets.map((rawItem, i) => {
+                    const item = typeof rawItem === "string" ? { code: rawItem } : rawItem as { code: string; language?: string; filename?: string; description?: string };
+                    return (
+                      <div key={i} style={{ background: "#1e1e1e", padding: "12px", borderRadius: "8px", border: "1px solid var(--border)" }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", paddingBottom: "8px", borderBottom: "1px solid #333", marginBottom: "12px" }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                            {item.filename && <span style={{ fontSize: "13px", fontWeight: 600, color: "#d4d4d4" }}>{item.filename}</span>}
+                            {item.language && <span style={{ fontSize: "11px", textTransform: "uppercase", color: "#888", border: "1px solid #333", padding: "2px 6px", borderRadius: "4px" }}>{item.language}</span>}
+                            {!item.filename && !item.language && <span style={{ fontSize: "12px", color: "#888" }}>Code Snippet</span>}
+                          </div>
+                        </div>
+                        {item.description && <p style={{ fontSize: "12px", color: "#a0a0a0", marginBottom: "8px" }}>{item.description}</p>}
+                        <pre style={{ margin: 0, padding: 0, overflowX: "auto", fontFamily: "monospace", fontSize: "13px", color: "#d4d4d4", whiteSpace: "pre-wrap", wordBreak: "break-all" }}>
+                          <code>{item.code}</code>
+                        </pre>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
             {ctx.pending_tasks?.length > 0 && (
               <div className={styles.section}>
                 <h2 className={styles.sectionTitle}>⏳ Pending Tasks</h2>

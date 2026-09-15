@@ -3,7 +3,7 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { StructuredContext } from "@/lib/types";
-import { ContinueModal, EditableList } from "./ContextComponents";
+import { ContinueModal, EditableList, CodeSnippetList } from "./ContextComponents";
 import styles from "./context.module.css";
 
 interface ContextPageClientProps {
@@ -210,7 +210,7 @@ export default function ContextPageClient({ context, projects }: ContextPageClie
             {/* Code Snippets & Commands */}
             <section className={styles.section}>
               <h2 className={styles.sectionTitle}>💻 Code Snippets & Commands</h2>
-              <EditableList
+              <CodeSnippetList
                 items={ctx.code_snippets || []}
                 onChange={(items) => updateCtx({ code_snippets: items })}
                 placeholder="Add code snippet or command..."
